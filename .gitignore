@@ -44,3 +44,4 @@ next-env.d.ts
 /.clerk/
 notes.txt
 /src/generated/prisma
+/scripts/system-voices
