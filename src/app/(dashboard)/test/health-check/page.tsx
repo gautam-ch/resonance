@@ -4,7 +4,7 @@ import {trpc,prefetch, HydrateClient} from "@/trpc/server";
 import { ErrorBoundary } from "react-error-boundary";
 
 
-export default function(){
+export default function HC(){
     prefetch(trpc.health.queryOptions());
 
      return(
