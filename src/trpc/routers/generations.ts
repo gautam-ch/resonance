@@ -5,6 +5,7 @@ import {prisma} from "@/lib/db";
 import { uploadAudio } from "@/lib/r2";
 import { TEXT_MAX_LENGTH } from "@/features/text-to-speech/data/constants";
 import { createTRPCRouter,orgProcedure } from "../init";
+import { polar } from "@/lib/polar";
 
 export const generationsRouter = createTRPCRouter({
     getById: orgProcedure.input(
@@ -52,6 +53,28 @@ export const generationsRouter = createTRPCRouter({
             repetitionPenalty:z.number().min(1).max(2).default(1.2),
         })
     ).mutation(async ({input,ctx})=>{
+
+             // Check for active subscription before generation
+            try {
+                const customerState = await polar.customers.getStateExternal({
+                externalId: ctx.orgId,
+                });
+                const hasActiveSubscription =
+                (customerState.activeSubscriptions ?? []).length > 0;
+                if (!hasActiveSubscription) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "SUBSCRIPTION_REQUIRED",
+                });
+                }
+            } catch (err) {
+                if (err instanceof TRPCError) throw err;
+                // Customer doesn't exist in Polar yet -> no subscription
+                throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "SUBSCRIPTION_REQUIRED",
+                });
+            }
          
           const voice = await prisma.voice.findUnique({
             where:{
@@ -161,6 +184,23 @@ export const generationsRouter = createTRPCRouter({
                 message:"Failed to store generate audio"
             })
           }
+
+          
+      // Ingest usage event to Polar (fire-and-forget, don't block response)
+      polar.events
+        .ingest({
+          events: [
+            {
+              name: "tts_generations",
+              externalCustomerId: ctx.orgId,
+              metadata: { characters: input.text.length },
+              timestamp: new Date(),
+            },
+          ],
+        })
+        .catch(() => {
+          // Silently fail 
+        });
 
           return {
             id:generationId,
