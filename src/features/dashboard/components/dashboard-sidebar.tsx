@@ -33,7 +33,9 @@ import {
   Headphones,
 } from "lucide-react";
 import Link from "next/link";
-
+import { UsageContainer } from "@/features/billing/components/usage-container";
+import { VoiceCreateDialog } from "@/features/voices/components/voice-create-dialog";
+import { useState } from "react";
 
 interface MenuItem {
   title: string;
@@ -96,6 +98,7 @@ function NavSection({ label, items, pathname }: NavSectionProps) {
 export function DashboardSidebar() {
   const pathname = usePathname();
   const clerk = useClerk();
+  const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
 
   const mainMenuItems: MenuItem[] = [
     {
@@ -116,6 +119,7 @@ export function DashboardSidebar() {
     {
       title: "Voice cloning",
       icon: Volume2,
+      onClick: () => setVoiceDialogOpen(true),
     },
   ];
 
@@ -127,13 +131,17 @@ export function DashboardSidebar() {
     },
     {
       title: "Help and support",
-      url: "mailto:gautamchouhan93012@gmail.com",
+      url: "mailto:business@codewithantonio.com",
       icon: Headphones,
     },
   ];
 
   return (
     <>
+    <VoiceCreateDialog
+      open={voiceDialogOpen}
+      onOpenChange={setVoiceDialogOpen}
+    />
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex flex-col gap-4 pt-4">
         <div 
@@ -141,8 +149,8 @@ export function DashboardSidebar() {
           <Image
             src="/logo.svg"
             alt="Resonance"
-            width={48}
-            height={48}
+            width={24}
+            height={24}
             className="rounded-sm"
           />
           <span className="group-data-[collapsible=icon]:hidden font-semibold text-lg tracking-tighter text-foreground">
@@ -189,6 +197,7 @@ export function DashboardSidebar() {
       </SidebarContent>
       <div className="border-b border-dashed border-border" />
       <SidebarFooter className="gap-3 py-3">
+        <UsageContainer />
         <SidebarMenu>
           <SidebarMenuItem>
             <UserButton

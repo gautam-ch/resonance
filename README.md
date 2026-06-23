@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resonance AI
 
-## Getting Started
+A professional-grade AI Text-to-Speech (TTS) platform designed for high-quality voice synthesis and management.
 
-First, run the development server:
+## 🚀 Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Resonance is a modern, scalable platform that enables users to generate natural-sounding speech from text using advanced AI models. Built with a focus on multitenancy and performance, it provides a seamless interface for voice selection, audio generation, and organization management.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **High-Fidelity TTS**: Generate audio with expressive AI voices including support for emotional cues.
+- **Voice Management**: Browse and select from a library of system-managed and custom voices.
+- **Multi-tenant Architecture**: Full support for organizations and teams via Clerk integration.
+- **Real-time Recording**: Capture original audio directly in the browser for custom voice training.
+- **Type-Safe API**: End-to-end type safety using tRPC and TypeScript.
+- **Cloud-Native Storage**: Distributed audio storage leveraging Cloudflare R2/S3.
+- **Scalable Inference**: Python-based TTS engine running on Modal for on-demand GPU compute.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Frontend**: [Next.js](https://nextjs.org/) (App Router), [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/)
+- **State Management**: [TanStack Query](https://tanstack.com/query) & [tRPC](https://trpc.io/)
+- **Authentication**: [Clerk](https://clerk.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
+- **Inference Layer**: [Python](https://www.python.org/) & [Modal](https://modal.com/)
+- **Storage**: [Cloudflare R2](https://www.cloudflare.com/products/r2/) / S3
+- **Billing**: [Polar](https://polar.sh/)
 
-To learn more about Next.js, take a look at the following resources:
+## 🏁 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js (Latest LTS)
+- PostgreSQL database
+- Modal account (for TTS inference)
+- Clerk account (for authentication)
 
-## Deploy on Vercel
+### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd resonance
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables (copy `.env.example` if available).
+
+4. Initialize the database:
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev
+   ```
+
+5. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## ⚙️ Environment Variables
+
+Ensure the following variables are set in your `.env` file:
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk public key
+- `CLERK_SECRET_KEY`: Clerk private key
+- `CHATTERBOX_API_URL`: URL for the Modal inference endpoint
+- `CHATTERBOX_API_KEY`: Secret key for inference authentication
+- `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`: Storage credentials
+
+## 📄 License
+
+Private / Proprietary. All rights reserved.

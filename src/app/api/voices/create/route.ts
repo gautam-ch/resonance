@@ -1,10 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import {parseBuffer} from "music-metadata";
-import {file, z} from "zod";
+import {z} from "zod";
 import {prisma} from "@/lib/db";
 import { uploadAudio } from "@/lib/r2";
 import { VOICE_CATEGORIES } from "@/features/voices/data/voice-categories";
 import type { VoiceCategory } from "@/generated/prisma/enums";
+import { polar } from "@/lib/polar";
 
 const createVoiceSchema =z.object({
     name:z.string().min(1,"Voice name is required"),
@@ -24,6 +25,21 @@ export async function POST(
      if(!userId || !orgId){
         return new Response("Unauthorized",{status:401});
      }
+
+        // Check for active subscription before voice creation
+            try {
+                const customerState = await polar.customers.getStateExternal({
+                externalId: orgId,
+                });
+                const hasActiveSubscription =
+                (customerState.activeSubscriptions ?? []).length > 0;
+                if (!hasActiveSubscription) {
+                return Response.json({ error: "SUBSCRIPTION_REQUIRED" }, { status: 403 });
+                }
+            } catch {
+                // Customer doesn't exist in Polar yet -> no subscription
+                return Response.json({ error: "SUBSCRIPTION_REQUIRED" }, { status: 403 });
+            }
      //why not body : we need file so better to searchParams
      const url = new URL(request.url);
 
@@ -147,6 +163,22 @@ export async function POST(
             {status:500},
         )
      }
+
+      // Ingest usage event to Polar (fire-and-forget, don't block response)
+  polar.events
+    .ingest({
+      events: [
+        {
+          name:"voice_creation",
+          externalCustomerId: orgId,
+          metadata: {},
+          timestamp: new Date(),
+        },
+      ],
+    })
+    .catch(() => {
+      // Silently fail 
+    });
 
      return Response.json(
         {message:"Voice created successfully"},
